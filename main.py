@@ -1,10 +1,16 @@
 from fastapi import FastAPI
-import numpy as np
+import pandas as pd
 from pydantic import BaseModel
 import joblib
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
 
 # Load your model here
 model = joblib.load('model/model.pkl')
+
+# Load the preprocessor
+preprocessor = joblib.load('model/preprocessor.pkl')
 
 class Item(BaseModel):
     # Define your input schema here
@@ -25,28 +31,42 @@ class Item(BaseModel):
 
 app = FastAPI()
 
+# Load training data
+train_data = pd.read_csv('model/preprocessed.csv')
+
+# Identify numeric and categorical columns
+numeric_columns = ['age', 'trestbps', 'chol', 'thalch', 'oldpeak']
+categorical_columns = ['sex', 'cp', 'dataset', 'restecg', 'slope']
+
+# Initialize SimpleImputer for numeric features
+numeric_imputer = SimpleImputer(strategy='mean')
+
+# Initialize SimpleImputer for categorical features
+categorical_imputer = SimpleImputer(strategy='most_frequent')
+
+# Initialize OneHotEncoder for categorical features
+one_hot_encoder = OneHotEncoder()
+
+# Create a ColumnTransformer to apply different preprocessing steps to numeric and categorical columns
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('numeric', numeric_imputer, numeric_columns),
+        ('categorical', one_hot_encoder, categorical_columns)
+    ],
+    remainder='passthrough'
+)
+
+# Fit the ColumnTransformer with training data
+preprocessor.fit(train_data)
+
 @app.post("/predict")
 async def predict(item: Item):
-    # One-hot encode categorical features
-    encoded_sex = 1 if item.sex == "Male" else 0
-    encoded_dataset = 1 if item.dataset == "Cleveland" else 0
-    encoded_cp = 1 if item.cp == "typical angina" else 0
-    encoded_restecg = 1 if item.restecg == "lv hypertrophy" else 0
-    encoded_slope = 1 if item.slope == "downsloping" else 0
+    # Convert item to a DataFrame
+    data = pd.DataFrame(item.dict(), index=[0])
     
-    # Prepare input data
-    data = [
-        item.id, item.age, encoded_sex, encoded_dataset, encoded_cp,
-        item.trestbps, item.chol, item.fbs, encoded_restecg, item.thalch,
-        item.exang, item.oldpeak, encoded_slope, item.num
-    ]
+    # Preprocess the input data
+    preprocessed_data = preprocessor.transform(data)
     
-    # Convert data to numpy array
-    data_array = np.array(data).reshape(1, -1)
-    prediction = model.predict(data)
-    return {"prediction": prediction}
-
-@app.get("/")
-def read_root():
-
-    return {"Hello": "World"}
+    # Predict using the model
+    prediction = model.predict(preprocessed_data)
+    return {"prediction": prediction.tolist()}
