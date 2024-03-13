@@ -2,7 +2,6 @@ curl -X POST "http://localhost:8000/predict" -H "Content-Type: application/json"
   "id": 1,
   "age": 63,
   "sex": "Male",
-  "dataset": "Cleveland",
   "cp": "typical angina",
   "trestbps": 145.0,
   "chol": 233.0,
@@ -10,8 +9,7 @@ curl -X POST "http://localhost:8000/predict" -H "Content-Type: application/json"
   "restecg": "lv hypertrophy",
   "thalch": 150.0,
   "exang": false,
-  "oldpeak": 2.3,
-  "slope": "downsloping"
+  "oldpeak": 2.3
 }'
 
 
@@ -31,4 +29,18 @@ Invoke-RestMethod -Uri "http://localhost:8000/predict" -Method POST -Headers @{"
   "exang": false,
   "oldpeak": 2.3,
   "slope": "downsloping"
+}'
+
+curl -X POST "http://localhost:8000/predict" -H "Content-Type: application/json" -d '{
+  "id": 1,
+  "age": 63,
+  "sex": 1,
+  "cp": 3,
+  "trestbps": 145.0,
+  "chol": 233.0,
+  "fbs": 1,
+  "restecg": 1,
+  "thalch": 150.0,
+  "exang": 0,
+  "oldpeak": 2.3
 }'

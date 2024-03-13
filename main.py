@@ -9,23 +9,36 @@ from sklearn.pipeline import Pipeline
 
 # Load your model and preprocessor
 model = joblib.load('model/model.pkl')
-preprocessor = joblib.load('model/preprocessor.pkl')
+scaler = joblib.load('model/scaler.pkl')
 
 # Define the input schema
+# class Item(BaseModel):
+#     id: int
+#     age: int
+#     sex: str
+#     dataset: str
+#     cp: str
+#     trestbps: float
+#     chol: float
+#     fbs: bool
+#     restecg: str
+#     thalch: float
+#     exang: bool
+#     oldpeak: float
+#     slope: str
+
 class Item(BaseModel):
     id: int
     age: int
-    sex: str
-    dataset: str
-    cp: str
+    sex: int
+    cp: int
     trestbps: float
     chol: float
-    fbs: bool
-    restecg: str
+    fbs: int
+    restecg: int
     thalch: float
-    exang: bool
+    exang: int
     oldpeak: float
-    slope: str
 
 app = FastAPI()
 
@@ -36,11 +49,12 @@ async def predict(item: Item):
 
     # Ensure correct data types
     # This step is important because FastAPI converts all boolean values to True/False, but your model might expect 1/0
-    input_data['fbs'] = input_data['fbs'].astype(int)
-    input_data['exang'] = input_data['exang'].astype(int)
+    # input_data['fbs'] = input_data['fbs'].astype(int)
+    # input_data['exang'] = input_data['exang'].astype(int)
     
     # Preprocess the input data using the loaded preprocessor
-    preprocessed_data = preprocessor.transform(input_data)
+    print(input_data)
+    preprocessed_data = scaler.transform(input_data)
 
     # Make a prediction
     prediction = model.predict(preprocessed_data)
