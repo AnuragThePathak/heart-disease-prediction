@@ -1,24 +1,18 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
 import joblib
 from sklearn.pipeline import Pipeline
 
-# Load your model here
+# Load your model and preprocessor
 model = joblib.load('model/model.pkl')
-
-# Define the categorical columns and the preprocessor
-categorical_columns = ['sex', 'cp','dataset','fbs','restecg','exang','slope']
 preprocessor = joblib.load('model/preprocessor.pkl')
 
-# Create a pipeline that first transforms the data and then applies the model
-pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
-
+# Define the input schema
 class Item(BaseModel):
-    # Define your input schema here
     id: int
     age: int
     sex: str
@@ -34,9 +28,22 @@ class Item(BaseModel):
     slope: str
 
 app = FastAPI()
+
 @app.post("/predict")
 async def predict(item: Item):
-    # Convert the item to a dictionary, get the values, convert to list and reshape it
-    data = pd.DataFrame([item.dict()])
-    prediction = pipeline.predict(data)
-    return {"prediction": prediction}
+    # Convert the input data into a DataFrame to work with ColumnTransformer
+    input_data = pd.DataFrame([item.dict()])
+
+    # Ensure correct data types
+    # This step is important because FastAPI converts all boolean values to True/False, but your model might expect 1/0
+    input_data['fbs'] = input_data['fbs'].astype(int)
+    input_data['exang'] = input_data['exang'].astype(int)
+    
+    # Preprocess the input data using the loaded preprocessor
+    preprocessed_data = preprocessor.transform(input_data)
+
+    # Make a prediction
+    prediction = model.predict(preprocessed_data)
+
+    # Return the prediction
+    return {"prediction": prediction.tolist()}

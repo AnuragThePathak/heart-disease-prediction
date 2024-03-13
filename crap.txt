@@ -13,3 +13,22 @@ curl -X POST "http://localhost:8000/predict" -H "Content-Type: application/json"
   "oldpeak": 2.3,
   "slope": "downsloping"
 }'
+
+
+Windows PowerShell
+
+Invoke-RestMethod -Uri "http://localhost:8000/predict" -Method POST -Headers @{"Content-Type" = "application/json"} -Body '{
+  "id": 1,
+  "age": 63,
+  "sex": "Male",
+  "dataset": "Cleveland",
+  "cp": "typical angina",
+  "trestbps": 145.0,
+  "chol": 233.0,
+  "fbs": true,
+  "restecg": "lv hypertrophy",
+  "thalch": 150.0,
+  "exang": false,
+  "oldpeak": 2.3,
+  "slope": "downsloping"
+}'
