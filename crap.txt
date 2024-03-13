@@ -2,11 +2,11 @@ curl -X POST "http://localhost:8000/predict" -H "Content-Type: application/json"
   "id": 1,
   "age": 63,
   "sex": "Male",
-  "cp": "typical angina",
+  "cp": "typical-angina",
   "trestbps": 145.0,
   "chol": 233.0,
   "fbs": true,
-  "restecg": "lv hypertrophy",
+  "restecg": "lv-hypertrophy",
   "thalch": 150.0,
   "exang": false,
   "oldpeak": 2.3
