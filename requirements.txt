@@ -1,0 +1,6 @@
+Brotli @ file:///private/tmp/python-brotli-20231117-5241-4nexpv/Brotli-1.1.0
+certifi @ file:///private/tmp/python-certifi-20240201-4501-9cw706/certifi-2024.2.2
+mutagen @ file:///private/tmp/python-mutagen-20231211-52587-rzjsmz/mutagen-1.47.0
+openvino @ file:///private/tmp/openvino-20240120-6229-wy43y0/openvino-2023.3.0/src/bindings/python/wheel
+TBB @ file:///private/tmp/tbb-20231202-4800-tiu1mu/oneTBB-2021.11.0/python
+wheel @ file:///opt/homebrew/Cellar/python%403.12/3.12.2_1/libexec/wheel-0.42.0-py3-none-any.whl#sha256=5f1ca525bef7466225922019d72cb06a9e91cd3ff807ddd4be1acb84655e5107
