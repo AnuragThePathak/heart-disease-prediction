@@ -1,15 +1,18 @@
 from fastapi import FastAPI
+import numpy as np
 from pydantic import BaseModel
 import pandas as pd
 import joblib
+from fastapi.middleware.cors import CORSMiddleware
 
 # Load your model and preprocessor
-model = joblib.load('model/model.pkl')
 scaler = joblib.load('model/scaler.pkl')
+rf_model = joblib.load('model/rf_model.pkl')
+lr_model = joblib.load('model/lr_model.pkl')
+adaboost_model = joblib.load('model/adaboost_model.pkl')
 
 # Define the input schema
 class Item(BaseModel):
-    id: int
     age: int
     sex: str
     cp: str
@@ -23,7 +26,20 @@ class Item(BaseModel):
 
 app = FastAPI()
 
-@app.post("/predict")
+origins = [
+    "http://localhost:3000",  # React app
+    "http://localhost:8000",  # FastAPI server
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.post("/")
 async def predict(item: Item):
     # Convert the input data into a DataFrame to work with ColumnTransformer
     input_data = pd.DataFrame([item.model_dump()])
@@ -42,7 +58,14 @@ async def predict(item: Item):
     preprocessed_data = scaler.transform(input_data)
 
     # Make a prediction
-    prediction = model.predict(preprocessed_data)
+    rf_prediction = rf_model.predict(preprocessed_data)
+    lr_prediction = lr_model.predict(preprocessed_data)
+    
+    # Reshape the predictions to be a 2D array
+    predictions = np.array([rf_prediction, lr_prediction]).reshape(1, -1)
+
+    # Use the reshaped predictions as input to the AdaBoost model
+    prediction = adaboost_model.predict(predictions)
 
     # Return the prediction
     return {"prediction": prediction.tolist()}
