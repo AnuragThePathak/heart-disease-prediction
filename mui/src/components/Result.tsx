@@ -8,6 +8,7 @@ import DialogActions from '@mui/material/DialogActions'
 import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
 import Typography from '@mui/material/Typography'
+import { Link } from "@mui/material"
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -47,6 +48,13 @@ export default function CustomizedDialogs({ result, open, handleClose }: { resul
             {result ? "You should consult a doctor as soon as possible."
               : "You should still consult a doctor to be sure."}
           </Typography>
+          {result ? links.map((link, index) => (
+            <Typography key={index} gutterBottom>
+              {index + 1}. <Link href={link} target="_blank">
+                {link}
+              </Link>
+            </Typography>
+          )) : ""}
         </DialogContent>
         <DialogActions>
           <Button autoFocus onClick={handleClose}>
@@ -57,3 +65,10 @@ export default function CustomizedDialogs({ result, open, handleClose }: { resul
     </React.Fragment>
   )
 }
+
+const links = [
+  "https://www.healthline.com/health/heart-disease",
+  "https://www.webmd.com/heart-disease/heart-disease-types-causes-symptoms",
+  "https://www.healthline.com/nutrition/a-heart-healthy-diet-food-lists-diet-tips-and-more",
+  "https://www.healthline.com/health/heart-disease/complications"
+]
