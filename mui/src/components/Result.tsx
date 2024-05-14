@@ -70,5 +70,6 @@ const links = [
   "https://www.healthline.com/health/heart-disease",
   "https://www.webmd.com/heart-disease/heart-disease-types-causes-symptoms",
   "https://www.healthline.com/nutrition/a-heart-healthy-diet-food-lists-diet-tips-and-more",
-  "https://www.healthline.com/health/heart-disease/complications"
+  "https://www.healthline.com/health/heart-disease/complications",
+  "https://www.ashpveda.com/collections/heart-care",
 ]
